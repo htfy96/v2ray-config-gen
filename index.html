@@ -9,8 +9,7 @@
 
   <body>
     <div class="ui container">
-      
-
+      <div class="ui info message">本生成器仅供研究试验目的，不支持也不推荐用于大量用户/端口的场合</div>
       <div class="ui grid" id="main">
         <div class="six wide column">
           <h3>设置</h3>
@@ -34,7 +33,7 @@
                     <h5 class="ui dividing header">用户设置</h5>
                     <ul>
                       <li v-for="user in service.users">
-                        <button class="compact red ui button" v-on:click="removeUser(service.users, $index)">delete</button>
+                        <button class="compact red ui button" v-on:click="removeUser(service.users, $index)">删除此用户</button>
                         <div class="field">
                           <label for="uuid-vmess-{{$index}}">用户uuid（点击<a href="https://www.uuidgenerator.net/" target="_blank">这里</a>生成）</label>
                           <input type="text" class="active" maxlength="36" v-model="user.uuid" id="uuid-vmess-{{$index}}"></input>
@@ -51,7 +50,7 @@
                     <h5 class="ui dividing header">端口设置</h5>
                     <ul>
                       <li v-for="port in service.ports">
-                        <button class="red compact ui button" v-on:click="removePort(service.ports, $index)">Delete</button>
+                        <button class="red compact ui button" v-on:click="removePort(service.ports, $index)">删除此端口</button>
                         <div class="field">
                           <label>端口号(1 ~ 65535)</label>
                           <input type="number" class="active" number v-model="port.number" min="1" max="65535"></input>
@@ -66,7 +65,7 @@
                         
                         <div class="field">
                           <span v-if="port.dynamic">
-                            <label>动态端口范围（a-b形式）</label>
+                            <label>动态端口范围（a-b形式, 至少有10个）</label>
                             <input type="text" class="active" v-model="port.dynrange"></input>
                           </span>
                         </div>
@@ -89,10 +88,36 @@
         </div>
         <div class="five wide column">
           <h3>服务端配置</h3>
-          <pre>{{ services | json 4 }} </pre>
+          <pre> {{ serverjson | json 4 }} </pre>
         </div>
         <div class="five wide column">
           <h3>客户端配置</h3>
+          <div class="ui form">
+            <div class="field">
+              <label>输入本地端口号（建议>1024）</label>
+              <input type="text" v-model="clientport" number min="1" max="65535" maxlength="5"></input>
+            </div>
+            <div class="field">
+              <label>选择服务</label>
+              <select v-model="clientservice">
+                <option v-for="service in services" :value="$index">服务{{$index + 1}}: {{service.type}} </option>
+              </select>
+            </div>
+            <div v-if="clientservice != undefined" class="field">
+              <label>选择用户</label>
+              <select v-model="clientuser">
+                <option v-for="cu in clientusers" :value="cu.value">{{cu.name}}</option>
+              </select>
+            </div>
+            <div v-if="clientservice != undefined" class="field">
+              <label>选择服务端端口</label>
+              <select v-model="clientserverport">
+                <option v-for="csp in clientserverports" :value="csp.value"> {{csp.name}} </option>
+              </select>
+            </div>
+          </div>
+          <pre>{{ services | json 4 }} </pre>
+          <pre>{{clientservice}} </pre>
         </div>
       </div>
     </div>

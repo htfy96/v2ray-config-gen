@@ -1,9 +1,73 @@
 $(function() {
     console.log('initing...');
 
+    function makeVMess(service) {
+        results = [];
+        service.ports.forEach(function(elem) {
+            results = results.concat(makeVMessSinglePort(elem.number, service.users, elem.dynamic, elem.dynrange, elem.iskcp));
+        });
+        return results;
+    }
+
+    // returns [Inbound]
+    function makeVMessSinglePort(port, clients, isDynamic, dynRange, isKCP) {
+        var result = [];
+
+        var clientsConfig = clients.map(function(client) {
+            return {
+                "id": client.uuid,
+                "level": 1,
+                "alterId": parseInt(client.alterid)
+            };
+        });
+
+        var baseInbound = {
+            "port": port,
+            "protocol": "vmess",
+            "settings": {
+                "clients": clientsConfig
+            }
+        };
+
+        if (isKCP) {
+            baseInbound["streamSettings"] = {
+                "network": "kcp"
+            };
+        }
+
+        if (isDynamic) {
+            var extInbound = {
+                "protocol": "vmess",
+                "port": dynRange,
+                "tag": "vmess-detour-" + parseInt(Math.random() * 1000000),
+                "settings": {},
+                "allocate": {
+                    "strategy": "random",
+                    "concurrency": 5,
+                    "refresh": 5
+                }
+            };
+            baseInbound["features"] = {
+                "detour": {
+                    "to": extInbound.tag
+                }
+            };
+            if (isKCP)
+                extInbound["streamSettings"] = {
+                    "network": "kcp"
+                };
+
+            result.push(extInbound);
+        }
+        result.push(baseInbound);
+        return result;
+    }
+
     services = new Vue({
         el: '#main',
         data: {
+            clientservice: undefined,
+            clientuser: undefined,
             services: [
                 {
                     type: 'vmess',
@@ -36,6 +100,91 @@ $(function() {
             },
             removeUser: function(users, idx) {
                 users.splice(idx, 1);
+            }
+        },
+        computed: {
+            serverjson: function() {
+                var sj = {
+                    "log" : {
+                        "access": "/var/log/v2ray/access.log",
+                        "error": "/var/log/v2ray/error.log",
+                        "loglevel": "warning"
+                    },
+                    "inbound": {},
+                    "outbound": {
+                        "protocol": "freedom",
+                        "settings": {}
+                    },
+                    "inboundDetour": [],
+                    "outboundDetour": [
+                        {
+                            "protocol": "blackhole",
+                            "settings": {},
+                            "tag": "blocked"
+                        }
+                    ],
+                    "routing": {
+                        "strategy": "rules",
+                        "settings": {
+                            "rules": [
+                                {
+                                    "type": "field",
+                                    "ip": [
+                                        "0.0.0.0/8",
+                                        "10.0.0.0/8",
+                                        "100.64.0.0/10",
+                                        "127.0.0.0/8",
+                                        "169.254.0.0/16",
+                                        "172.16.0.0/12",
+                                        "192.0.0.0/24",
+                                        "192.0.2.0/24",
+                                        "192.168.0.0/16",
+                                        "198.18.0.0/15",
+                                        "198.51.100.0/24",
+                                        "203.0.113.0/24",
+                                        "::1/128",
+                                        "fc00::/7",
+                                        "fe80::/10"
+                                    ],
+                                    "outboundTag": "blocked"
+                                }
+                            ]
+                        }
+                    }
+                };
+
+                inbounds = [];
+                this.services.forEach(function(service) {
+                    if (service.type == "vmess")
+                        inbounds = inbounds.concat(makeVMess(service));
+                });
+                sj["inbound"] = inbounds;
+                mainInbound = inbounds.find(function(elem) {
+                    return !elem.tag;
+                });
+                inbounds.splice(inbounds.indexOf(mainInbound), 1);
+                sj["inbound"] = mainInbound;
+                sj["inboundDetour"] = inbounds;
+
+                return sj;
+            },
+            clientusers: function() {
+                var service = this.services[this.clientservice];
+                return service.users.map(function(elem, idx) {
+                    return {
+                        value: idx,
+                        name: elem.uuid
+                    };
+                });
+            },
+            clientserverports: function() {
+                var service = this.services[this.clientservice];
+                return service.ports.map(function(elem, idx) {
+                    return {
+                        value: idx,
+                        name: elem.number
+                    };
+                });
             }
         }
     });
