@@ -40,13 +40,13 @@
                         </div>
 
                         <div class="field">
-                          <label>使用的alterID数量（越大越不容易被识别，但消耗越大）</label> 
+                          <label>使用的alterID数量（越大越不容易被识别，但消耗越大）</label>
                           <input type="text" class="active" maxlength="4" v-model="user.alterid"></input>
                         </div>
                       </li>
                     </ul>
                     <button class="ui button" v-on:click="addUser(service.users)">添加用户</button>
-                    
+
                     <h5 class="ui dividing header">端口设置</h5>
                     <ul>
                       <li v-for="port in service.ports">
@@ -62,7 +62,7 @@
                             <label for="dynamic-vmess-{{$index}}">                    是否是动态端口（可能减少流量管控限制，也可能更快被封） </label>
                           </div>
                         </div>
-                        
+
                         <div class="field">
                           <span v-if="port.dynamic">
                             <label>动态端口范围（a-b形式, 至少有10个）</label>
@@ -76,7 +76,7 @@
                             <label for="iskcp-vmess-{{$index}}">是否是mKCP协议（可能更快，也可能彻底被封或不稳定）</label>
                           </div>
                         </div>
-                        
+
                       </li>
                     </ul>
                     <button class="ui button" v-on:click="addPort(service.ports)">添加端口</button>
@@ -121,7 +121,7 @@
         </div>
       </div>
     </div>
-    <script type="text/javascript" src="http://libs.useso.com/js/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://libs.useso.com/js/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="semantic.min.js"></script>
     <script type="text/javascript" src="vue.js"></script>
     <script type="text/javascript" src="main.js"> </script>
