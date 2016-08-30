@@ -18,6 +18,7 @@
               <div v-for="service in services">
                 <li>
                   <div id="type">
+                    <button class="compact red ui button" v-on:click="removeService(services, $index)">删除服务</button>
                     <h4 class="ui dividing header">服务{{$index + 1}}: 服务种类</h4>
                     <div class="field">
                       <select v-model="service.type">
@@ -81,9 +82,17 @@
                     </ul>
                     <button class="ui button" v-on:click="addPort(service.ports)">添加端口</button>
                   </div>
+                  <div id="shadowsocks-config" v-if="service.type=='shadowsocks'">
+                    <blockquote>
+                      开发中……
+                    </blockquote>
+                  </div>
                 </li>
               </div>
             </ol>
+
+            <button class="ui button" v-on:click="addService(services)">添加服务</button>
+
           </div>
         </div>
         <div class="five wide column">
@@ -93,6 +102,10 @@
         <div class="five wide column">
           <h3>客户端配置</h3>
           <div class="ui form">
+            <div class="field">
+              <label>输入服务端地址</label>
+              <input type="text" v-model="serveraddr"></input>
+            </div>
             <div class="field">
               <label>输入本地端口号（建议>1024）</label>
               <input type="text" v-model="clientport" number min="1" max="65535" maxlength="5"></input>
@@ -116,8 +129,9 @@
               </select>
             </div>
           </div>
-          <pre>{{ services | json 4 }} </pre>
-          <pre>{{clientservice}} </pre>
+          <pre v-if="clientserverport != undefined && clientuser != undefined">
+  {{clientjson | json 4}}
+          </pre>
         </div>
       </div>
     </div>
