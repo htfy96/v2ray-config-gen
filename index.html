@@ -5,6 +5,7 @@
     <link type="text/css" rel="stylesheet" href="semantic.min.css"  media="screen,projection"/>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script data-main="main.js" src="require.js"></script>
   </head>
 
   <body>
@@ -97,6 +98,7 @@
         </div>
         <div class="five wide column">
           <h3>服务端配置</h3>
+          <button class="ui button compact" v-clipboard:copy="serverjsonstr">复制配置</button>
           <pre> {{ serverjson | json 4 }} </pre>
         </div>
         <div class="five wide column">
@@ -129,16 +131,12 @@
               </select>
             </div>
           </div>
+          <button class="ui button compact" v-clipboard:copy="clientjsonstr">复制配置</button>
           <pre v-if="clientserverport != undefined && clientuser != undefined">
   {{clientjson | json 4}}
           </pre>
         </div>
       </div>
     </div>
-    <script type="text/javascript" src="https://libs.useso.com/js/jquery/2.1.1/jquery.min.js"></script>
-    <script type="text/javascript" src="semantic.min.js"></script>
-    <script type="text/javascript" src="vue.js"></script>
-    <script type="text/javascript" src="main.js"> </script>
-
   </body>
 </html>
