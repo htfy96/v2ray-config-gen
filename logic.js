@@ -228,7 +228,7 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                   "err": "信息不全"
               };
               var base = {
-                "port": 1085,
+                "port": this.clientport,
                 "log": {
                   "access": ""
                 },
