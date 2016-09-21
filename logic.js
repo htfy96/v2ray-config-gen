@@ -2,8 +2,23 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
     console.log('initing...');
     Vue.use(vueClipboard);
 
+    function makeShadowsocks(service) {
+        var result = [];
+        result.push({
+            "protocol": "shadowsocks",
+            "port": service.port,
+            "settings": {
+                "method": service.method,
+                "password": service.password,
+                "udp": service.udp,
+                "level": service.level
+            }
+        });
+        return result;
+    }
+
     function makeVMess(service) {
-        results = [];
+        var results = [];
         service.ports.forEach(function(elem) {
             results = results.concat(makeVMessSinglePort(elem.number, service.users, elem.dynamic, elem.dynrange, elem.iskcp));
         });
@@ -67,7 +82,7 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
     services = new Vue({
         el: '#main',
         data: {
-            clientservice: undefined,
+            clientservice: 0,
             clientuser: undefined,
             services: [
                 {
@@ -177,6 +192,8 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                 this.services.forEach(function(service) {
                     if (service.type == "vmess")
                         inbounds = inbounds.concat(makeVMess(service));
+                    if (service.type == "shadowsocks")
+                        inbounds = inbounds.concat(makeShadowsocks(service));
                 });
                 sj["inbound"] = inbounds;
                 mainInbound = inbounds.find(function(elem) {
@@ -207,6 +224,9 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                 });
             },
             clientjson: function() {
+              if (this.clientserverport == undefined || this.clientuser == undefined) return {
+                  "err": "信息不全"
+              };
               var base = {
                 "port": 1085,
                 "log": {
@@ -289,6 +309,7 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                 }
               };
               var s = this.services[this.clientservice];
+                if (!s.ports[this.clientserverport]) return {'err': '信息不全'};
               if (s && s.type == 'vmess') {
                 base.outbound = {
                   "protocol": "vmess",
@@ -308,7 +329,6 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                     ]
                   }
                 };
-
                 if (s.ports[this.clientserverport].iskcp) {
                   base.outbound.streamSettings = {'network': 'kcp'};
                 }
