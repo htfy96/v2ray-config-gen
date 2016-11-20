@@ -2,6 +2,16 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
     console.log('initing...');
     Vue.use(vueClipboard);
 
+    function uuid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+            s4() + '-' + s4() + s4() + s4();
+    }
+
     function makeShadowsocks(service) {
         var result = [];
         result.push({
@@ -63,10 +73,8 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                     "refresh": 5
                 }
             };
-            baseInbound["features"] = {
-                "detour": {
-                    "to": extInbound.tag
-                }
+            baseInbound["detour"] = {
+                "to": extInbound.tag
             };
             if (isKCP)
                 extInbound["streamSettings"] = {
@@ -89,7 +97,7 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                     type: 'vmess',
                     users: [
                         {
-                            uuid: '5165165-sdfafdf',
+                            uuid: uuid(),
                             alterid: 100
                         }
                     ],
@@ -126,6 +134,9 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
             },
             removeService: function(services, idx) {
               services.splice(idx, 1);
+            },
+            genUserId: function(users, idx) {
+                users[idx].uuid = uuid();
             }
         },
         computed: {
@@ -228,11 +239,11 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                   "err": "信息不全"
               };
               var base = {
-                "port": this.clientport,
                 "log": {
-                  "access": ""
+                  "loglevel": "warning"
                 },
                 "inbound": {
+                  "port": this.clientport,
                   "protocol": "socks",
                   "settings": {
                     "auth": "noauth",
