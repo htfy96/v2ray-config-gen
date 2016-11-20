@@ -63,10 +63,8 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                     "refresh": 5
                 }
             };
-            baseInbound["features"] = {
-                "detour": {
-                    "to": extInbound.tag
-                }
+            baseInbound["detour"] = {
+                "to": extInbound.tag
             };
             if (isKCP)
                 extInbound["streamSettings"] = {
@@ -228,11 +226,11 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                   "err": "信息不全"
               };
               var base = {
-                "port": this.clientport,
                 "log": {
-                  "access": ""
+                  "loglevel": "warning"
                 },
                 "inbound": {
+                  "port": this.clientport,
                   "protocol": "socks",
                   "settings": {
                     "auth": "noauth",
