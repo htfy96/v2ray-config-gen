@@ -77,7 +77,7 @@
                       <li v-for="user in service.users">
                         <button class="compact red ui button" v-on:click="removeUser(service.users, $index)">删除此用户</button>
                         <div class="field">
-                          <label for="uuid-vmess-{{$index}}">用户uuid（<a href="#" v-on:click="genUserId(service.users, $index)">重新生成</a>）</label>
+                          <label for="uuid-vmess-{{$index}}">用户uuid（<a href="#" v-on:click.stop="genUserId(service.users, $index)">重新生成</a>）</label>
                           <input type="text" class="active" maxlength="36" v-model="user.uuid" id="uuid-vmess-{{$index}}"></input>
                         </div>
 
