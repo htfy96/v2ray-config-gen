@@ -117,7 +117,9 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                 ports.push({});
             },
             addUser: function(users) {
-                users.push({});
+                users.push({
+                    uuid: uuid()
+                });
             },
             removePort: function(ports, idx) {
                 ports.splice(idx, 1);
