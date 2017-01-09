@@ -8,172 +8,177 @@
     <script data-main="main.js" src="require.js"></script>
   </head>
 
-  <body>
+<body>
     <div class="ui container">
       <div class="ui info message">本生成器仅供研究试验目的，不支持也不推荐用于大量用户/端口的场合</div>
-      <div class="ui grid" id="main">
-        <div class="six wide column">
-          <h3>设置</h3>
-          <div id="settings" class="ui form">
-            <ol>
-              <div v-for="service in services">
-                <li>
-                  <div id="type">
-                    <button class="compact red ui button" v-on:click="removeService(services, $index)">删除服务</button>
-                    <h4 class="ui dividing header">服务{{$index + 1}}: 服务种类</h4>
-                    <div class="field">
-                      <select v-model="service.type">
-                        <option value="vmess">VMess</option>
-                        <option value="shadowsocks">Shadowsocks</option>
-                      </select>
+      <div id="app"></div>
+    </div>
+
+    <script type="x-template" id="template">
+        <div class="ui grid" id="main">
+          <div class="six wide column">
+            <h3>设置</h3>
+            <div id="settings" class="ui form">
+              <ol>
+                <div v-for="service in services">
+                  <li>
+                    <div id="type">
+                      <button class="compact red ui button" v-on:click="removeService(services, $index)">删除服务</button>
+                      <h4 class="ui dividing header">服务{{$index + 1}}: 服务种类</h4>
+                      <div class="field">
+                        <select v-model="service.type">
+                          <option value="vmess">VMess</option>
+                          <option value="shadowsocks">Shadowsocks</option>
+                        </select>
+                      </div>
                     </div>
-                  </div>
 
-<div id="shadowsocks-config" v-if="service.type=='shadowsocks'">
-<h4 class="ui dividing header">Shadowsocks设置</h4>
+          <div id="shadowsocks-config" v-if="service.type=='shadowsocks'">
+          <h4 class="ui dividing header">Shadowsocks设置</h4>
 
-    <div class="field">
-        <label>端口号</label>
-        <input type="number" number v-model="service.port">
-    </div>
+            <div class="field">
+                <label>端口号</label>
+                <input type="number" number v-model="service.port">
+            </div>
 
-    <div class="field">
-        <label>加密方法</label>
-        <select v-model="service.method">
-            <option value="aes-256-cfb">AES-256-CFB(推荐)</option>
-            <option value="aes-128-cfb">AES-128-CFB</option>
-            <option value="chacha20">Chacha20</option>
-            <option value="chacha20-ietf">Chacha20-ietf</option>
-        </select>
-    </div>
+            <div class="field">
+                <label>加密方法</label>
+                <select v-model="service.method">
+                    <option value="aes-256-cfb">AES-256-CFB(推荐)</option>
+                    <option value="aes-128-cfb">AES-128-CFB</option>
+                    <option value="chacha20">Chacha20</option>
+                    <option value="chacha20-ietf">Chacha20-ietf</option>
+                </select>
+            </div>
 
-    <div class="field">
-        <label>密码</label>
-        <input type="text" v-model="service.password">
-    </div>
+            <div class="field">
+                <label>密码</label>
+                <input type="text" v-model="service.password">
+            </div>
 
-    <div class="field">
-      <div class="ui checkbox">
-        <input type="checkbox" class="ui checkbox" v-model="service.udp" id="udp-ss-{{$index}}">
-        <label for="udp-ss-{{$index}}">是否开启UDP转发</label>
-      </div>
-    </div>
-
-    <div class="field">
-        <label>用户等级</label>
-        <select v-model="service.level">
-            <option value="0" number>非私用VPS，安全性更好(0)</option>
-            <option value="1" number>私用VPS，性能略好(1)</option>
-        </select>
-    </div>
-
-</div>
-
-                  <div id="vmess-config" v-if="service.type=='vmess'">
-                    <h4 class="ui dividing header">VMess设置</h4>
-
-                    <h5 class="ui dividing header">用户设置</h5>
-                    <ul>
-                      <li v-for="user in service.users">
-                        <button class="compact red ui button" v-on:click="removeUser(service.users, $index)">删除此用户</button>
-                        <div class="field">
-                          <label for="uuid-vmess-{{$index}}">用户uuid（<a href="#" v-on:click.stop="genUserId(service.users, $index)">重新生成</a>）</label>
-                          <input type="text" class="active" maxlength="36" v-model="user.uuid" id="uuid-vmess-{{$index}}"></input>
-                        </div>
-
-                        <div class="field">
-                          <label>使用的alterID数量（越大越不容易被识别，但消耗越大）</label>
-                          <input type="text" class="active" maxlength="4" v-model="user.alterid">
-                        </div>
-                      </li>
-                    </ul>
-                    <button class="ui button" v-on:click="addUser(service.users)">添加用户</button>
-
-                    <h5 class="ui dividing header">端口设置</h5>
-                    <ul>
-                      <li v-for="port in service.ports">
-                        <button class="red compact ui button" v-on:click="removePort(service.ports, $index)">删除此端口</button>
-                        <div class="field">
-                          <label>端口号(1 ~ 65535)</label>
-                          <input type="number" class="active" number v-model="port.number" min="1" max="65535"></input>
-                        </div>
-
-                        <div class="field">
-                          <div class="ui checkbox">
-                            <input type="checkbox" class="ui checkbox" id="dynamic-vmess-{{$index}}" v-model="port.dynamic">
-                            <label for="dynamic-vmess-{{$index}}">                    是否是动态端口（可能减少流量管控限制，也可能更快被封） </label>
-                          </div>
-                        </div>
-
-                        <div class="field">
-                          <span v-if="port.dynamic">
-                            <label>动态端口范围（a-b形式, 至少有10个）</label>
-                            <input type="text" class="active" v-model="port.dynrange"></input>
-                          </span>
-                        </div>
-
-                        <div class="field">
-                          <div class="ui checkbox">
-                            <input type="checkbox" class="ui checkbox" v-model="port.iskcp" id="iskcp-vmess-{{$index}}"></input>
-                            <label for="iskcp-vmess-{{$index}}">是否是mKCP协议（可能更快，也可能彻底被封或不稳定）</label>
-                          </div>
-                        </div>
-
-                      </li>
-                    </ul>
-                    <button class="ui button" v-on:click="addPort(service.ports)">添加端口</button>
-                  </div>
-                </li>
+            <div class="field">
+              <div class="ui checkbox">
+                <input type="checkbox" class="ui checkbox" v-model="service.udp" id="udp-ss-{{$index}}">
+                <label for="udp-ss-{{$index}}">是否开启UDP转发</label>
               </div>
-            </ol>
+            </div>
 
-            <button class="ui button" v-on:click="addService(services)">添加服务</button>
+            <div class="field">
+                <label>用户等级</label>
+                <select v-model="service.level">
+                    <option value="0" number>非私用VPS，安全性更好(0)</option>
+                    <option value="1" number>私用VPS，性能略好(1)</option>
+                </select>
+            </div>
 
           </div>
-        </div>
-        <div class="five wide column">
-          <h3>服务端配置</h3>
-          <button class="ui button compact" v-clipboard:copy="serverjsonstr">复制配置</button>
-          <pre> {{ serverjson | json 4 }} </pre>
-        </div>
-        <div class="five wide column">
-          <h3>客户端配置</h3>
-          <div class="ui form">
-            <div class="field">
-              <label>输入服务端地址</label>
-              <input type="text" v-model="serveraddr">
+
+                      <div id="vmess-config" v-if="service.type=='vmess'">
+                        <h4 class="ui dividing header">VMess设置</h4>
+
+                        <h5 class="ui dividing header">用户设置</h5>
+                        <ul>
+                          <li v-for="user in service.users">
+                            <button class="compact red ui button" v-on:click="removeUser(service.users, $index)">删除此用户</button>
+                            <div class="field">
+                              <label for="uuid-vmess-{{$index}}">用户uuid（<a href="#" v-on:click.stop="genUserId(service.users, $index)">重新生成</a>）</label>
+                              <input type="text" class="active" maxlength="36" v-model="user.uuid" id="uuid-vmess-{{$index}}"></input>
+                            </div>
+
+                            <div class="field">
+                              <label>使用的alterID数量（越大越不容易被识别，但消耗越大）</label>
+                              <input type="text" class="active" maxlength="4" v-model="user.alterid">
+                            </div>
+                          </li>
+                        </ul>
+                        <button class="ui button" v-on:click="addUser(service.users)">添加用户</button>
+
+                        <h5 class="ui dividing header">端口设置</h5>
+                        <ul>
+                          <li v-for="port in service.ports">
+                            <button class="red compact ui button" v-on:click="removePort(service.ports, $index)">删除此端口</button>
+                            <div class="field">
+                              <label>端口号(1 ~ 65535)</label>
+                              <input type="number" class="active" number v-model="port.number" min="1" max="65535"></input>
+                            </div>
+
+                            <div class="field">
+                              <div class="ui checkbox">
+                                <input type="checkbox" class="ui checkbox" id="dynamic-vmess-{{$index}}" v-model="port.dynamic">
+                                <label for="dynamic-vmess-{{$index}}">                    是否是动态端口（可能减少流量管控限制，也可能更快被封） </label>
+                              </div>
+                            </div>
+
+                            <div class="field">
+                              <span v-if="port.dynamic">
+                                <label>动态端口范围（a-b形式, 至少有10个）</label>
+                                <input type="text" class="active" v-model="port.dynrange"></input>
+                              </span>
+                            </div>
+
+                            <div class="field">
+                              <div class="ui checkbox">
+                                <input type="checkbox" class="ui checkbox" v-model="port.iskcp" id="iskcp-vmess-{{$index}}"></input>
+                                <label for="iskcp-vmess-{{$index}}">是否是mKCP协议（可能更快，也可能彻底被封或不稳定）</label>
+                              </div>
+                            </div>
+
+                          </li>
+                        </ul>
+                        <button class="ui button" v-on:click="addPort(service.ports)">添加端口</button>
+                      </div>
+                    </li>
+                  </div>
+                </ol>
+
+                <button class="ui button" v-on:click="addService(services)">添加服务</button>
+
+              </div>
             </div>
-            <div class="field">
-              <label>输入本地端口号（建议大于1024）</label>
-              <input type="text" v-model="clientport" number min="1" max="65535" maxlength="5">
+            <div class="five wide column">
+              <h3>服务端配置</h3>
+              <button class="ui button compact" v-clipboard:copy="serverjsonstr">复制配置</button>
+              <pre> {{ serverjson | json 4 }} </pre>
             </div>
-            <div class="field">
-              <label>选择服务</label>
-              <select v-model="clientservice">
-                <template v-for="service in services">
-                    <option v-if="service.type!='shadowsocks'" :value="$index">服务{{$index + 1}}: {{service.type}} </option>
-                </template>
-              </select>
-            </div>
-            <div v-if="clientservice != undefined" class="field">
-              <label>选择用户</label>
-              <select v-model="clientuser">
-                <option v-for="cu in clientusers" :value="cu.value">{{cu.name}}</option>
-              </select>
-            </div>
-            <div v-if="clientservice != undefined" class="field">
-              <label>选择服务端端口</label>
-              <select v-model="clientserverport">
-                <option v-for="csp in clientserverports" :value="csp.value"> {{csp.name}} </option>
-              </select>
-            </div>
+            <div class="five wide column">
+              <h3>客户端配置</h3>
+              <div class="ui form">
+                <div class="field">
+                  <label>输入服务端地址</label>
+                  <input type="text" v-model="serveraddr">
+                </div>
+                <div class="field">
+                  <label>输入本地端口号（建议大于1024）</label>
+                  <input type="text" v-model="clientport" number min="1" max="65535" maxlength="5">
+                </div>
+                <div class="field">
+                  <label>选择服务</label>
+                  <select v-model="clientservice">
+                    <template v-for="service in services">
+                        <option v-if="service.type!='shadowsocks'" :value="$index">服务{{$index + 1}}: {{service.type}} </option>
+                    </template>
+                  </select>
+                </div>
+                <div v-if="clientservice != undefined" class="field">
+                  <label>选择用户</label>
+                  <select v-model="clientuser">
+                    <option v-for="cu in clientusers" :value="cu.value">{{cu.name}}</option>
+                  </select>
+                </div>
+                <div v-if="clientservice != undefined" class="field">
+                  <label>选择服务端端口</label>
+                  <select v-model="clientserverport">
+                    <option v-for="csp in clientserverports" :value="csp.value"> {{csp.name}} </option>
+                  </select>
+                </div>
+              </div>
+              <button class="ui button compact" v-clipboard:copy="clientjsonstr">复制配置</button>
+              <pre v-if="clientserverport != undefined && clientuser != undefined">
+      {{clientjson | json 4}}
+              </pre>
           </div>
-          <button class="ui button compact" v-clipboard:copy="clientjsonstr">复制配置</button>
-          <pre v-if="clientserverport != undefined && clientuser != undefined">
-  {{clientjson | json 4}}
-          </pre>
       </div>
-  </div>
-    </div>
+    </script>
+
 </body>
 </html>

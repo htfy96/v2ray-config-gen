@@ -88,7 +88,8 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
     }
 
     services = new Vue({
-        el: '#main',
+        el: '#app',
+        template: '#template',
         data: {
             clientservice: 0,
             clientuser: undefined,
