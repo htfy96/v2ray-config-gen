@@ -93,6 +93,8 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
         data: {
             clientservice: 0,
             clientuser: undefined,
+            clientMuxEnabled: false,
+            clientserverport: null,
             services: [
                 {
                     type: 'vmess',
@@ -238,7 +240,7 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                 });
             },
             clientjson: function() {
-              if (this.clientserverport == undefined || this.clientuser == undefined) return {
+              if (this.clientserverport == undefined || this.clientuser == undefined || this.clientMuxEnabled === undefined) return {
                   "err": "信息不全"
               };
               var base = {
@@ -347,7 +349,13 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function($, Vue, vueCl
                   base.outbound.streamSettings = {'network': 'kcp'};
                 }
 
-              }
+                }
+                if (base.outbound && this.clientMuxEnabled) {
+                    base.outbound.mux = {
+                        "enabled": true,
+                        "concurrency": 8
+                    }
+                }
 
 
 

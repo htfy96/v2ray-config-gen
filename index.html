@@ -171,6 +171,10 @@
                     <option v-for="csp in clientserverports" :value="csp.value"> {{csp.name}} </option>
                   </select>
                 </div>
+                <div v-if="clientservice !== undefined" class="field">
+                  <input type="checkbox" class="ui checkbox" id="client-mux" v-model="clientMuxEnabled">
+                  <label for="client-mux">是否使用Mux.cool在一个底层连接上传输多个连接（测试特性）</label>
+                </div>
               </div>
               <button class="ui button compact" v-clipboard:copy="clientjsonstr">复制配置</button>
               <pre v-if="clientserverport != undefined && clientuser != undefined">
