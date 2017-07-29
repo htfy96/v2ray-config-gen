@@ -127,6 +127,35 @@
                         </ul>
                         <button class="ui button" v-on:click="addPort(service.ports)">添加端口</button>
                       </div>
+
+                      <div>
+                        <h4 class="ui dividing header">传输配置</h4>
+                        <div>
+                          <h5 class="ui dividing header">传输层加密(TLS)</h5>
+                          <div class="field">
+                            <input type="checkbox" class="ui checkbox" v-model="service.transport.tls" id="tls-{{$index}}"></input>
+                            <label for="tls-{{$index}}">启用传输层加密</label>
+                          </div>
+                          <template v-if="service.transport.tls">
+                            <div class="field">
+                              <label>服务端域名</label>
+                              <input type="text" v-model="service.transport.tlsServerName"></input>
+                            </div>
+                            <div class="field">
+                              <input type="checkbox" class="ui checkbox" v-model="service.transport.tlsAllowInsecure" id="tls-allow-insecure-{{$index}}"></input>
+                              <label for="tls-allow-insecure-{{$index}}">允许客户端接受不安全证书（如自己签发的而不是Let's Encrypt等受信机构签发的）</label>
+                            </div>
+                            <div class="field">
+                              <label>服务端证书(crt)路径</label>
+                              <input type="text" v-model="service.transport.tlsCertificateFile"></input>
+                            </div>
+                            <div class="field">
+                              <label>服务端密钥(key)路径</label>
+                              <input type="text" v-model="service.transport.tlsKeyFile"></input>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
                     </li>
                   </div>
                 </ol>

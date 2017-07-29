@@ -87,6 +87,32 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function ($, Vue, vueC
         return result;
     }
 
+    function configTransport(item, service) {
+        if (service.transport && service.transport.tls) {
+            item.streamSettings = item.streamSettings || {}
+            item.streamSettings.security = 'tls'
+            item.streamSettings.tlsSettings = {
+                "serverName": service.transport.tlsServerName,
+                "certificates": [{
+                    "certificateFile": service.transport.tlsCertificateFile,
+                    "keyFile": service.transport.tlsKeyFile
+                }]
+            }
+        }
+    }
+
+    function makeService(service) {
+        var result = null
+        if (service.type === 'vmess')
+            result = makeVMess(service)
+        if (service.type === 'shadowsocks')
+            result = makeShadowsocks(service)
+        result.forEach(function(item) {
+            configTransport(item, service)
+        })
+        return result
+    }
+
     services = new Vue({
         el: '#app',
         template: '#template',
@@ -106,7 +132,13 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function ($, Vue, vueC
                     dynamic: true,
                     dynrange: "10000-10010",
                     iskcp: true
-                }]
+                }],
+                transport: {
+                    tls: false,
+                    tlsServerName: '',
+                    tlsCertificateFile: '',
+                    tlsKeyFile: ''
+                }
             }]
         },
         methods: {
@@ -128,7 +160,10 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function ($, Vue, vueC
                 services.push({
                     type: 'vmess',
                     users: [],
-                    ports: []
+                    ports: [],
+                    transport: {
+                        tls: false
+                    }
                 });
             },
             removeService: function (services, idx) {
@@ -196,10 +231,7 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function ($, Vue, vueC
 
                 inbounds = [];
                 this.services.forEach(function (service) {
-                    if (service.type == "vmess")
-                        inbounds = inbounds.concat(makeVMess(service));
-                    if (service.type == "shadowsocks")
-                        inbounds = inbounds.concat(makeShadowsocks(service));
+                    inbounds = inbounds.concat(makeService(service))
                 });
                 sj["inbound"] = inbounds;
                 mainInbound = inbounds.find(function (elem) {
@@ -340,6 +372,15 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function ($, Vue, vueC
                     base.outbound.mux = {
                         "enabled": true,
                         "concurrency": 8
+                    }
+                }
+
+                if (s && s.transport && s.transport.tls) {
+                    base.outbound.streamSettings = base.outbound.streamSettings || {}
+                    base.outbound.streamSettings.security = true
+                    base.outbound.streamSettings.tlsSettings = {
+                        serverName: s.transport.tlsServerName,
+                        allowInsecure: s.transport.tlsAllowInsecure
                     }
                 }
 
