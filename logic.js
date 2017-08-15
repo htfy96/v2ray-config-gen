@@ -270,6 +270,7 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function ($, Vue, vueC
                         "loglevel": "warning"
                     },
                     "inbound": {
+                        "listen": "127.0.0.1",
                         "port": this.clientport,
                         "protocol": "socks",
                         "settings": {
