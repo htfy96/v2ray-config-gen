@@ -21,7 +21,7 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function ($, Vue, vueC
                 "method": service.method,
                 "password": service.password,
                 "udp": service.udp,
-                "level": service.level
+                "level": parseInt(service.level)
             }
         });
         return result;
