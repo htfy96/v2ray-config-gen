@@ -357,7 +357,7 @@ requirejs(['jquery', 'vue', 'vue-clipboard', 'domReady'], function ($, Vue, vueC
                                 "users": [{
                                     "id": s.users[this.clientuser].uuid,
                                     "level": 1,
-                                    "alterId": s.users[this.clientuser].alterid
+                                    "alterId": parseInt(s.users[this.clientuser].alterid)
                                 }]
                             }]
                         }
