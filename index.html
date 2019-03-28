@@ -44,11 +44,14 @@
                       <div class="field">
                           <label>加密方法</label>
                           <select v-model="service.method">
-                              <option value="aes-256-cfb">AES-256-CFB(推荐)</option>
+                              <option value="aes-256-cfb">AES-256-CFB</option>
                               <option value="aes-128-cfb">AES-128-CFB</option>
+                              <option value="aes-256-gcm">AES-256-GCM</option>
+                              <option value="aes-128-gcm">AES-128-GCM</option>
                               <option value="chacha20">Chacha20</option>
                               <option value="chacha20-ietf">Chacha20-ietf</option>
-                              <option value="chacha20-poly-1305">chacha20-poly-1305</option>
+                              <option value="chacha20-poly1305">chacha20-poly1305</option>
+                              <option value="chacha20-ietf-poly1305">chacha20-ietf-poly1305</option>
                           </select>
                       </div>
 
